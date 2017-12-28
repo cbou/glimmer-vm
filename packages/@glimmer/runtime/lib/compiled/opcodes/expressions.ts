@@ -70,6 +70,18 @@ APPEND_OPCODES.add(Op.GetBlock, (vm, { op1: _block }) => {
   stack.push(block);
 });
 
+APPEND_OPCODES.add(Op.UnwrapBlock, (vm) => {
+  let { stack } = vm;
+  let reference = check(vm.stack.pop(), CheckPathReference);
+
+  if (reference['IS_BLOCK'] !== true) {
+    debugger;
+    throw new Error("ZOMG");
+  }
+
+  stack.push(reference.value());
+});
+
 APPEND_OPCODES.add(Op.DestructureBlock, (vm) => {
   let { stack } = vm;
   let block = stack.pop();

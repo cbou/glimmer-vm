@@ -29,6 +29,28 @@ export class PrimitiveReference<T extends Primitive> extends ConstReference<T> i
   }
 }
 
+export type Block = {};
+
+export class BlockReference extends ConstReference<Block> implements PathReference<Block> {
+  static create(block: Option<Block>): PathReference<Opaque> {
+    if (block === null) {
+      return NULL_REFERENCE;
+    } else {
+      return new BlockReference(block);
+    }
+  }
+
+  public IS_BLOCK = true;
+
+  private constructor(value: Block) {
+    super(value);
+  }
+
+  get(_key: string): PrimitiveReference<Primitive> {
+    return UNDEFINED_REFERENCE;
+  }
+}
+
 class StringReference extends PrimitiveReference<string> {
   private lengthReference: Option<PrimitiveReference<number>> = null;
 

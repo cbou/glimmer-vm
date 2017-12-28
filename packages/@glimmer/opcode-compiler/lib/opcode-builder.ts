@@ -848,6 +848,7 @@ export abstract class OpcodeBuilder<Locator> extends SimpleOpcodeBuilder {
       this.pop();
       this.compileArgs([], null, null, false);
       this.dup(Register.sp, 1);
+      this.unwrapBlock();
 
       this.invokeBlock();
 
@@ -870,6 +871,10 @@ export abstract class OpcodeBuilder<Locator> extends SimpleOpcodeBuilder {
     this.invokeYield();
     this.popScope();
     this.popFrame();
+  }
+
+  unwrapBlock() {
+    this.push(Op.UnwrapBlock);
   }
 
   destructureBlock() {
@@ -924,7 +929,6 @@ export abstract class OpcodeBuilder<Locator> extends SimpleOpcodeBuilder {
       this.invokeComponent(attrs, params, hash, synthetic, block, inverse, layout);
       return;
     }
-    debugger;
 
     this.fetch(Register.s0);
     this.dup(Register.sp, 1);

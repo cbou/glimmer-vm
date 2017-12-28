@@ -604,6 +604,11 @@ OPCODE_METADATA(Op.DestructureBlock, {
   stackChange: 2
 });
 
+OPCODE_METADATA(Op.UnwrapBlock, {
+  name: 'UnwrapBlock',
+  stackChange: 0
+});
+
 OPCODE_METADATA(Op.HasBlock, {
   name: 'HasBlock',
   ops: [ScopeBlock('block')],

@@ -97,6 +97,7 @@ export const enum Op {
    *   ..., BlockPart1, BlockPart2, BlockPart3
    */
   DestructureBlock,
+  UnwrapBlock,
 
   /**
    * Operation:

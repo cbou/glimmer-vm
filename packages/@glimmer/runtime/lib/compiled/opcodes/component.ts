@@ -57,7 +57,8 @@ import {
   CheckComponentInstance,
   CheckFinishedComponentInstance
 } from './-debug-strip';
-import { TRUE_REFERENCE, FALSE_REFERENCE } from '../../references';
+import { TRUE_REFERENCE, FALSE_REFERENCE, BlockReference } from '../../references';
+import { ConstReference } from '@glimmer/reference/lib/const';
 
 export const ARGS = new Arguments();
 
@@ -101,26 +102,20 @@ export interface PartialComponentDefinition {
 
 APPEND_OPCODES.add(Op.IsBlock, vm => {
   let stack = vm.stack;
-  let ref = stack.pop();
-  // let ref = check(stack.pop(), CheckReference);
+  let ref = check(stack.pop(), CheckReference);
 
-  if (typeof ref['value'] === 'function') {
-    stack.push(FALSE_REFERENCE);
-  } else {
+  if (ref['IS_BLOCK']) {
     stack.push(TRUE_REFERENCE);
+  } else {
+    stack.push(FALSE_REFERENCE);
   }
 });
 
 APPEND_OPCODES.add(Op.IsComponent, vm => {
   let stack = vm.stack;
-  let ref = stack.pop();
-  // let ref = check(stack.pop(), CheckReference);
+  let ref = check(stack.pop(), CheckReference);
 
-  if (typeof ref['value'] === 'function') {
-    stack.push(IsCurriedComponentDefinitionReference.create(ref));
-  } else {
-    stack.push(FALSE_REFERENCE);
-  }
+  stack.push(IsCurriedComponentDefinitionReference.create(ref));
 });
 
 APPEND_OPCODES.add(Op.CurryComponent, (vm, { op1: _meta }) => {
@@ -479,12 +474,24 @@ debugger;
       if (lookup) lookup[symbolName] = block;
     };
 
+    let bindFirstClassBlock = (symbolName: string, blockName: string) => {
+      let symbol = symbols.indexOf(symbolName);
+
+      let block = blocks.get(blockName);
+
+      if (symbol !== -1) {
+        scope.bindSymbol(symbol + 1, BlockReference.create(block));
+      }
+
+      if (lookup) lookup[symbolName] = block;
+    };
+
     let blocks = args.blocks;
     bindBlock(ATTRS_BLOCK, 'attrs');
     bindBlock('&inverse', 'else');
     bindBlock('&default', 'main');
-    bindBlock('@else', 'else');
-    bindBlock('@main', 'main');
+    bindFirstClassBlock('@else', 'else');
+    bindFirstClassBlock('@main', 'main');
 
     if (lookup) scope.bindEvalScope(lookup);
 

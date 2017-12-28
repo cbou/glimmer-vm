@@ -28,6 +28,34 @@ export class YieldSuite extends RenderTest {
   }
 
   @test
+  'passing blocks as data'() {
+    this.registerComponent("Glimmer", "Block", "inside: {{@block}}");
+
+    this.render(
+      {
+        layout: '{{#if @predicate}}<Block @block={{@main}} />{{else}}<Block @block={{@else}} />{{/if}}',
+        args: { predicate: 'activated' },
+        template: 'Hello from @main {{outer}}',
+        inverse: 'Hello from @else {{outer}}',
+      },
+      { activated: true, outer: 'outer' }
+    );
+
+    this.assertComponent('inside: Hello from @main outer');
+    this.assertStableRerender();
+
+    this.rerender({ activated: false });
+
+    this.assertComponent('inside: Hello from @else outer');
+    this.assertStableRerender();
+
+    this.rerender({ activated: true });
+
+    this.assertComponent('inside: Hello from @main outer');
+    this.assertStableRerender();
+  }
+
+  @test
   'yield'() {
     this.render(
       {
