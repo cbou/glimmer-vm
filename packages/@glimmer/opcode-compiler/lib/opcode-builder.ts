@@ -984,9 +984,13 @@ export abstract class OpcodeBuilder<Locator> extends SimpleOpcodeBuilder {
           break;
 
         case '@':
-          if (symbol === '@main') {
-            // make a reference to the block
-          }
+          // if (symbol === '@main' && block) {
+          //   this.pushYieldableBlock(block);
+          //   this.wrapBlock();
+          //   bindings.push({ symbol: i + 1, isBlock: false });
+          //   continue;
+          //   // make a reference to the block
+          // }
 
           if (!hash) {
             break;
