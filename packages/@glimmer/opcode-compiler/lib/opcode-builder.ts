@@ -765,6 +765,7 @@ export abstract class OpcodeBuilder<Locator> extends SimpleOpcodeBuilder {
 
     this.startLabels();
 
+    console.log('builtInGuardedAppend')
     this.isComponent();
 
     this.enter(2);
@@ -805,14 +806,19 @@ export abstract class OpcodeBuilder<Locator> extends SimpleOpcodeBuilder {
       this.primitive(this.stdLib.guardedAppend as Recast<VMHandle, number>);
       this.invokeVirtual();
     } else {
+      console.log('guardedAppend', expression);
 
       this.expr(expression);
 
       this.dup();
-
       this.isComponent();
 
-      this.enter(2);
+      this.dup(Register.sp, 1);
+      this.isBlock();
+
+      this.enter(3);
+
+      this.jumpIf('BLOCK');
 
       this.jumpUnless('ELSE');
 
@@ -836,6 +842,18 @@ export abstract class OpcodeBuilder<Locator> extends SimpleOpcodeBuilder {
       this.exit();
 
       this.return();
+
+      this.label('BLOCK');
+
+      this.pop();
+      this.compileArgs([], null, null, false);
+      this.dup(Register.sp, 1);
+
+      this.invokeBlock();
+
+      this.exit();
+
+      this.return();
     }
 
     this.label('END');
@@ -846,13 +864,22 @@ export abstract class OpcodeBuilder<Locator> extends SimpleOpcodeBuilder {
 
   }
 
-  yield(to: number, params: Option<WireFormat.Core.Params>) {
-    this.compileArgs(params, null, null, false);
-    this.getBlock(to);
+  invokeBlock() {
+    this.destructureBlock();
     this.resolveBlock();
     this.invokeYield();
     this.popScope();
     this.popFrame();
+  }
+
+  destructureBlock() {
+    this.push(Op.DestructureBlock);
+  }
+
+  yield(to: number, params: Option<WireFormat.Core.Params>) {
+    this.compileArgs(params, null, null, false);
+    this.getBlock(to);
+    this.invokeBlock();
   }
 
   populateLayout(state: number) {
@@ -1033,6 +1060,10 @@ export abstract class OpcodeBuilder<Locator> extends SimpleOpcodeBuilder {
     this.popFrame();
 
     this.stopLabels();
+  }
+
+  isBlock() {
+    this.push(Op.IsBlock);
   }
 
   isComponent() {

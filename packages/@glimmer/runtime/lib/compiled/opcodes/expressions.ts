@@ -67,6 +67,12 @@ APPEND_OPCODES.add(Op.GetProperty, (vm, { op1: _key }) => {
 APPEND_OPCODES.add(Op.GetBlock, (vm, { op1: _block }) => {
   let { stack } = vm;
   let block = vm.scope().getBlock(_block);
+  stack.push(block);
+});
+
+APPEND_OPCODES.add(Op.DestructureBlock, (vm) => {
+  let { stack } = vm;
+  let block = stack.pop();
 
   if (block) {
     stack.push(block[2]);

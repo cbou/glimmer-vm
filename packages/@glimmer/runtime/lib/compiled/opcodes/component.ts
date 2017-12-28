@@ -57,6 +57,7 @@ import {
   CheckComponentInstance,
   CheckFinishedComponentInstance
 } from './-debug-strip';
+import { TRUE_REFERENCE, FALSE_REFERENCE } from '../../references';
 
 export const ARGS = new Arguments();
 
@@ -98,11 +99,28 @@ export interface PartialComponentDefinition {
   manager: InternalComponentManager;
 }
 
+APPEND_OPCODES.add(Op.IsBlock, vm => {
+  let stack = vm.stack;
+  let ref = stack.pop();
+  // let ref = check(stack.pop(), CheckReference);
+
+  if (typeof ref['value'] === 'function') {
+    stack.push(FALSE_REFERENCE);
+  } else {
+    stack.push(TRUE_REFERENCE);
+  }
+});
+
 APPEND_OPCODES.add(Op.IsComponent, vm => {
   let stack = vm.stack;
-  let ref = check(stack.pop(), CheckReference);
+  let ref = stack.pop();
+  // let ref = check(stack.pop(), CheckReference);
 
-  stack.push(IsCurriedComponentDefinitionReference.create(ref));
+  if (typeof ref['value'] === 'function') {
+    stack.push(IsCurriedComponentDefinitionReference.create(ref));
+  } else {
+    stack.push(FALSE_REFERENCE);
+  }
 });
 
 APPEND_OPCODES.add(Op.CurryComponent, (vm, { op1: _meta }) => {
@@ -465,6 +483,8 @@ debugger;
     bindBlock(ATTRS_BLOCK, 'attrs');
     bindBlock('&inverse', 'else');
     bindBlock('&default', 'main');
+    bindBlock('@else', 'else');
+    bindBlock('@main', 'main');
 
     if (lookup) scope.bindEvalScope(lookup);
 
