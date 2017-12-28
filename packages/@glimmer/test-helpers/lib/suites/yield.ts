@@ -2,6 +2,19 @@ import { RenderTest, test } from '../render-test';
 
 export class YieldSuite extends RenderTest {
   @test
+  '@main'() {
+    this.render(
+      {
+        layout: '{{@main}}',
+        template: 'Hello from @main',
+      }
+    );
+
+    this.assertComponent('Hello from @main');
+    this.assertStableRerender();
+  }
+
+  @test
   'yield'() {
     this.render(
       {
