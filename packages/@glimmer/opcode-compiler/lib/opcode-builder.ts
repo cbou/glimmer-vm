@@ -897,6 +897,7 @@ export abstract class OpcodeBuilder<Locator> extends SimpleOpcodeBuilder {
       this.invokeComponent(attrs, params, hash, synthetic, block, inverse, layout);
       return;
     }
+    debugger;
 
     this.fetch(Register.s0);
     this.dup(Register.sp, 1);
@@ -952,6 +953,10 @@ export abstract class OpcodeBuilder<Locator> extends SimpleOpcodeBuilder {
           break;
 
         case '@':
+          if (symbol === '@main') {
+            // make a reference to the block
+          }
+
           if (!hash) {
             break;
           }

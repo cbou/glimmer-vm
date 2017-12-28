@@ -423,7 +423,7 @@ APPEND_OPCODES.add(Op.InvokeComponentLayout, (vm, { op1: _state }) => {
   let { stack } = vm;
   let { handle, table: { symbols, hasEval } } =
     check(vm.fetchValue(_state), CheckFinishedComponentInstance);
-
+debugger;
   {
     let self = check(stack.pop(), CheckPathReference);
 
